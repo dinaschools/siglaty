@@ -50,7 +50,7 @@ td.ix i.np{position:absolute;right:1px;top:0;color:#c33;cursor:pointer;display:n
 @media print{
 @page{margin:0}
 html,body{background:#fff;padding:0}.bar,.imp,.np{display:none!important}
-.stage{padding:0;overflow:visible}.page{width:auto;padding:0 7mm;box-shadow:none}.wr{display:table;width:100%}.wh{display:table-header-group}.wf{display:table-footer-group}.wb{display:table-row-group}.wh::before,.wf::before{content:"";display:block;height:7mm}body.fit .stage{padding:0 7mm}body.fit .page{width:1123px;padding:0;zoom:var(--z,1);break-inside:avoid}
+.stage{padding:0 7mm;overflow:visible}.page{padding:0;box-shadow:none;zoom:var(--zl,1)}@media print and (orientation:portrait){.page{zoom:var(--zp,1)}}.wr{display:table;width:100%}.wh{display:table-header-group}.wf{display:table-footer-group}.wb{display:table-row-group}.wh::before,.wf::before{content:"";display:block;height:7mm}body.fit .page{break-inside:avoid}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 thead{display:table-header-group}tr{break-inside:avoid}
 .mc i{display:none}input.bad{background:none;color:inherit}}
@@ -128,7 +128,7 @@ if(D.grand)b+=`<td class="tt" id="gt${r}"></td>`;if(D.pct)b+=`<td class="tt" id=
 let ft='';if(D.stats){const nC=D.groups.reduce((a,g)=>a+g.subs.length+(g.tot?1:0),0)+(D.grand?1:0)+(D.pct?1:0);ft='<tfoot>'+['a','x','n'].map(k=>`<tr><td colspan="2" class="lb">${LB(k)}</td>`+Array.from({length:nC},(_,i)=>`<td id="f${k}${i}"></td>`).join('')+(D.pct?'<td></td>':'')+'</tr>').join('')+'</tfoot>'}
 $('#tb').innerHTML=`<thead>${h1}</tr>${h2}</tr>${h3}</tr></thead><tbody>${b}</tbody>${ft}`;
 $('#sg').innerHTML=D.sig.map((t,i)=>`<div><span contenteditable data-sg="${i}">${esc(t)}</span><a class="np" data-act="dsg" data-i="${i}">×</a></div>`).join('');
-recalc();renderSet()}
+recalc();renderSet();fw()}
 function setNames(l){l.forEach((n,i)=>{if(!D.st[i])D.st[i]={n:'',c:{}};D.st[i].n=n});render();save()}
 function ext(rows){const o=[];rows.forEach(r=>{const c=(Array.isArray(r)?r:String(r).split('\t')).map(x=>String(x??'').trim()).filter(Boolean);const n=c.find(x=>!/^[\d٠-٩.\s]+$/.test(x));if(n)o.push(n)});return o}
 function A(a){
@@ -168,7 +168,7 @@ else if(d.k=='sm'){G(d.g).subs.find(s=>s.id==d.s).m=v;recalc()}
 save()});
 document.addEventListener('keydown',e=>{const t=e.target,d=t.dataset;if(e.key!='Enter'||d.r===undefined)return;e.preventDefault();
 const q=`input[data-r="${+d.r+1}"]`+(d.s?`[data-s="${d.s}"]`:'[data-k="name"]');const n=document.querySelector(q);if(n)n.focus()});
-$('#fs').oninput=e=>{D.fs=+e.target.value;document.documentElement.style.setProperty('--fs',D.fs+'px');save()};
+$('#fs').oninput=e=>{D.fs=+e.target.value;document.documentElement.style.setProperty('--fs',D.fs+'px');fw();save()};
 $('#gr').onchange=e=>{D.grand=e.target.checked;render();save()};
 $('#xf').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const w=XLSX.read(await f.arrayBuffer());const r=XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]],{header:1});const l=ext(r);if(l.length)setNames(l);else alert('لم أجد أسماء في الملف')}catch(x){alert('تعذر قراءة الملف')}e.target.value=''};
 $('#jf').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(!j.groups||!j.st)throw 0;D=j;render();save()}catch(x){alert('ملف غير صالح')}e.target.value=''};
@@ -201,8 +201,9 @@ cell.border={top:S,bottom:S,left:ends.has(c)?TK:S,right:S};
 if(i==h)cell.fill=fl('0A2A5E');else if(i==h+1)cell.fill=fl('D3E8F6');else if(i==h+2)cell.fill=fl('E8F4FB');else if(st||i==hl+1)cell.fill=fl('D3E8F6');else if((i-h)%2==0)cell.fill=fl('F5FAFD')}}
 const buf=await wb.xlsx.writeBuffer();
 dl('سجل-متابعة.xlsx',new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}))}
-function ap(){const o=D.fit?(D.or||'landscape'):D.or;document.getElementById('pgs').textContent=o?`@page{size:A4 ${o};margin:0}`:''}
-function prep(){document.body.classList.toggle('fit',!!D.fit);if(!D.fit)return;const L=(D.or||'landscape')=='landscape',mm=3.7795,pg=document.querySelector('.page'),sm=document.getElementById('sm'),H=pg.offsetHeight-(sm?sm.offsetHeight:0),W=pg.offsetWidth,z=Math.min((L?283:196)*mm/W,(L?196:283)*mm/H,1)*0.97;document.documentElement.style.setProperty('--z',z)}
+function ap(){document.getElementById('pgs').textContent=D.or?`@page{size:A4 ${D.or};margin:0}`:''}
+function fw(){const pg=document.querySelector('.page'),tb=document.getElementById('tb');pg.style.width='1123px';pg.style.width=Math.max(1123,tb.offsetWidth+36)+'px'}
+function prep(){document.body.classList.toggle('fit',!!D.fit);const pg=document.querySelector('.page'),sm=document.getElementById('sm'),mm=3.7795,W=pg.offsetWidth,H=pg.offsetHeight-(sm?sm.offsetHeight:0),r=document.documentElement.style,f=(w,h)=>Math.min(w*mm/W,D.fit?h*mm/H:1,1)*.97;r.setProperty('--zl',f(283,196));r.setProperty('--zp',f(196,283))}
 function toast(m){const e=document.getElementById('ts');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
 function doPrint(){try{prep();window.focus();window.print();if(window.top!==window.self)toast('إن لم تظهر نافذة الطباعة فاضغط Ctrl+P أو افتح السجل في صفحة مستقلة')}catch(e){toast('تعذرت الطباعة من هذا العرض؛ اضغط Ctrl+P')}}
 addEventListener('beforeprint',prep);
