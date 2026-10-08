@@ -16,7 +16,7 @@ body{margin:0;background:#e6edf3;font-family:Tajawal,Tahoma,Arial,sans-serif;col
 .imp{display:none;background:#fff;padding:10px;border-bottom:3px solid var(--c)}.imp.on{display:block}
 .imp textarea{width:100%;height:90px;font:inherit}.imp button,.imp label{font:inherit;margin:4px 0 0 6px;padding:5px 10px;border-radius:6px;border:1px solid var(--b);background:var(--l);cursor:pointer}
 .stage{overflow-x:auto;padding:14px}
-.page{width:1123px;margin:0 auto;background:#fff;padding:14px 18px;box-shadow:0 2px 14px #0003}
+.page{width:var(--sw,1123px);margin:0 auto;background:#fff;padding:14px 18px;box-shadow:0 2px 14px #0003}
 .hd{display:grid;grid-template-columns:180px 1fr 180px;align-items:center;border-bottom:3px solid var(--n);padding-bottom:6px}
 .hd img{height:78px;max-width:170px;object-fit:contain}.hd .ri{justify-self:start}.hd .le{justify-self:end}
 .ct{text-align:center;line-height:1.55;font-weight:700;color:var(--n);font-size:13px}.ct>div:last-of-type{color:var(--b);font-size:15px;font-weight:800}
@@ -50,7 +50,7 @@ td.ix i.np{position:absolute;right:1px;top:0;color:#c33;cursor:pointer;display:n
 @media print{
 @page{margin:0}
 html,body{background:#fff;padding:0}.bar,.imp,.np{display:none!important}
-.stage{padding:0 7mm;overflow:visible}.page{padding:0;box-shadow:none;zoom:var(--zl,1)}@media print and (orientation:portrait){.page{zoom:var(--zp,1)}}.wr{display:table;width:100%}.wh{display:table-header-group}.wf{display:table-footer-group}.wb{display:table-row-group}.wh::before,.wf::before{content:"";display:block;height:7mm}body.fit .page{break-inside:avoid}
+.stage{padding:0 calc(var(--pm,5)*1mm);overflow:visible}.page{padding:0;box-shadow:none;zoom:var(--zl,1);width:var(--pwl,1123px)}@media print and (orientation:portrait){.page{zoom:var(--zp,1);width:var(--pwp,794px)}}.wr{display:table;width:100%}.wh{display:table-header-group}.wf{display:table-footer-group}.wb{display:table-row-group}.wh::before,.wf::before{content:"";display:block;height:calc(var(--pm,5)*1mm)}body.fit .page{break-inside:avoid}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 thead{display:table-header-group}tr{break-inside:avoid}
 .mc i{display:none}input.bad{background:none;color:inherit}}
@@ -91,7 +91,7 @@ function recalc0(){D.st.forEach((s,r)=>{const m=sums(s);D.groups.forEach((g,i)=>
 D.groups.forEach(g=>{const e=document.getElementById('tm'+g.id);if(e)e.textContent=rd(gmax(g))});const e=document.getElementById('gm');if(e)e.textContent=rd(D.groups.reduce((a,g)=>a+gmax(g),0))}
 const DEF={},DL={ix:'م',nm:'اسم الطالب',tot:'المجموع',gt:'المجموع الكلي',pc:'النسبة %',gd:'التقدير',a:'المتوسط',x:'الأعلى',n:'الأدنى'};let LS='r';
 const LB=k=>`<span contenteditable data-lb="${k}">${esc(D.lb[k])}</span>`;
-function renderSet(){$('#st').innerHTML=`<b>إعدادات السجل</b><div style="margin:6px 0">عدد حقول البيانات في الصف: <input type="number" data-set="mcols" min="1" max="8" value="${D.mcols}" style="width:56px"> &nbsp; حد التعثر (أقل من ٪): <input type="number" data-set="pass" min="1" max="100" value="${D.pass}" style="width:56px"></div><button data-act="asg">＋ توقيع</button><button data-act="ce">حذف الصفوف الفارغة</button><button data-act="cm">مسح كل الدرجات</button>`}
+function renderSet(){$('#st').innerHTML=`<b>إعدادات السجل</b><div style="margin:6px 0">عدد حقول البيانات في الصف: <input type="number" data-set="mcols" min="1" max="8" value="${D.mcols}" style="width:56px"> &nbsp; حد التعثر (أقل من ٪): <input type="number" data-set="pass" min="1" max="100" value="${D.pass}" style="width:56px"> &nbsp; هامش الطباعة (مم): <input type="number" data-set="pm" min="1" max="20" value="${D.pm}" style="width:56px"></div><button data-act="asg">＋ توقيع</button><button data-act="ce">حذف الصفوف الفارغة</button><button data-act="cm">مسح كل الدرجات</button>`}
 const amx=()=>D.groups.reduce((a,g)=>a+gmax(g),0);
 const pcOf=s=>{const m=sums(s),x=amx();return m.t===''||!x?'':rd(m.t/x*100)};
 const gr=p=>([...D.gs].sort((a,b)=>b[0]-a[0]).find(x=>p>=x[0])||[0,''])[1];
@@ -107,7 +107,7 @@ const ps=D.st.map(s=>({n:s.n,p:pcOf(s)})).filter(x=>x.p!==''),el=document.getEle
 if(!ps.length){el.innerHTML='';return}
 const top=[...ps].sort((a,b)=>b.p-a.p).slice(0,3).map(x=>esc(x.n||'—')+' ('+x.p+'%)').join('، '),low=ps.filter(x=>x.p<D.pass);
 el.innerHTML=`<b>ملخص:</b> رُصدت درجات ${ps.length} من ${D.st.length} · المتوسط ${rd(ps.reduce((a,x)=>a+x.p,0)/ps.length)}% · الأوائل: ${top} · أقل من ${D.pass}٪ (${low.length}): ${low.slice(0,8).map(x=>esc(x.n||'—')).join('، ')||'لا أحد'}`}
-function render(){D.pct=false;$('#or').value=D.or||'';$('#ft').checked=!!D.fit;ap();if(!D.m2){D.m2=1;if(!D.meta.some(m=>m[0]=='الأسبوع'))D.meta.push(['الأسبوع',''],['من',''],['إلى',''])}if(!D.m1){D.m1=1;D.sig=D.sig.map(x=>x=='رئيس القسم'?'المدير الأكاديمي':x)}D.stats??=true;D.hl??=['المملكة العربية السعودية','وزارة التعليم','الإدارة العامة للتعليم بمحافظة جدة','مدارس دينا العالمية'];D.lb={...DL,...D.lb};D.gs??=[[90,'ممتاز'],[80,'جيد جداً'],[70,'جيد'],[60,'مقبول'],[0,'ضعيف']];D.pass??=50;D.mcols??=4;D.lg??={};
+function render(){D.pct=false;D.pm??=5;$('#or').value=D.or||'';$('#ft').checked=!!D.fit;ap();if(!D.m2){D.m2=1;if(!D.meta.some(m=>m[0]=='الأسبوع'))D.meta.push(['الأسبوع',''],['من',''],['إلى',''])}if(!D.m1){D.m1=1;D.sig=D.sig.map(x=>x=='رئيس القسم'?'المدير الأكاديمي':x)}D.stats??=true;D.hl??=['المملكة العربية السعودية','وزارة التعليم','الإدارة العامة للتعليم بمحافظة جدة','مدارس دينا العالمية'];D.lb={...DL,...D.lb};D.gs??=[[90,'ممتاز'],[80,'جيد جداً'],[70,'جيد'],[60,'مقبول'],[0,'ضعيف']];D.pass??=50;D.mcols??=4;D.lg??={};
 $('#hl').innerHTML=D.hl.map((x,i)=>`<div><span contenteditable data-hl="${i}">${esc(x)}</span><a class="np" data-act="dh" data-i="${i}">×</a></div>`).join('')+'<a class="np" data-act="ah">＋ سطر</a>';
 for(const s of 'rl'){const im=$('.lw.'+(s=='r'?'ri':'le')+' img');if(!DEF[s])DEF[s]=im.src;const o=D.lg[s]||{};im.src=o.u||DEF[s];im.style.visibility=o.h?'hidden':'visible'}
 $('#meta').style.gridTemplateColumns=`repeat(${D.mcols},1fr)`;$('#sf').checked=D.stats;
@@ -202,8 +202,9 @@ if(i==h)cell.fill=fl('0A2A5E');else if(i==h+1)cell.fill=fl('D3E8F6');else if(i==
 const buf=await wb.xlsx.writeBuffer();
 dl('سجل-متابعة.xlsx',new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}))}
 function ap(){document.getElementById('pgs').textContent=D.or?`@page{size:A4 ${D.or};margin:0}`:''}
-function fw(){const pg=document.querySelector('.page'),tb=document.getElementById('tb');pg.style.width='1123px';pg.style.width=Math.max(1123,tb.offsetWidth+36)+'px'}
-function prep(){document.body.classList.toggle('fit',!!D.fit);const pg=document.querySelector('.page'),sm=document.getElementById('sm'),mm=3.7795,W=pg.offsetWidth,H=pg.offsetHeight-(sm?sm.offsetHeight:0),r=document.documentElement.style,f=(w,h)=>Math.min(w*mm/W,D.fit?h*mm/H:1,1)*.97;r.setProperty('--zl',f(283,196));r.setProperty('--zp',f(196,283))}
+function fw(){const r=document.documentElement.style;r.setProperty('--sw','1123px');r.setProperty('--sw',Math.max(1123,document.getElementById('tb').offsetWidth+36)+'px')}
+function prep(){document.body.classList.toggle('fit',!!D.fit);const pg=document.querySelector('.page'),sm=document.getElementById('sm'),mm=3.7795,m=D.pm??5,W=pg.offsetWidth,H=pg.offsetHeight-(sm?sm.offsetHeight:0),r=document.documentElement.style,f=(a,b)=>{const z=Math.min(a*mm/W,D.fit?b*mm/H:1,1)*.995;return[z,a*mm/z]};
+let[zl,wl]=f(297-2*m,210-2*m),[zp,wp]=f(210-2*m,297-2*m);r.setProperty('--pm',m);r.setProperty('--zl',zl);r.setProperty('--pwl',wl+'px');r.setProperty('--zp',zp);r.setProperty('--pwp',wp+'px')}
 function toast(m){const e=document.getElementById('ts');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
 function doPrint(){try{prep();window.focus();window.print();if(window.top!==window.self)toast('إن لم تظهر نافذة الطباعة فاضغط Ctrl+P أو افتح السجل في صفحة مستقلة')}catch(e){toast('تعذرت الطباعة من هذا العرض؛ اضغط Ctrl+P')}}
 addEventListener('beforeprint',prep);
