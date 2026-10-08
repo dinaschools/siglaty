@@ -81,6 +81,7 @@ const mg=(n,s)=>({id:uid(),n,tot:true,subs:s.map(([n,m])=>({id:uid(),n,m}))});
 const def=()=>({title:'سجل المتابعة',fs:11,grand:true,pct:true,stats:true,meta:[['الفصل الدراسي',''],['العام الدراسي',''],['القسم',''],['المرحلة',''],['الصف',''],['الفصل',''],['المادة','']],
 groups:[mg('المشاركة والتفاعل',[['المشاركة',5],['التفاعل',5]]),mg('الواجبات',[['١',5],['٢',5],['٣',5]]),mg('الاختبارات القصيرة',[['١',10],['٢',10]])],
 st:Array.from({length:30},()=>({n:'',c:{}})),sig:['المعلم/ـة','المدير الأكاديمي','مدير المدرسة']});
+if(/[?&]reset/.test(location.search)){try{localStorage.removeItem(K)}catch(e){}}
 let D;try{D=JSON.parse(localStorage.getItem(K))}catch(e){}
 if(!D||!D.groups)D=def();
 const G=id=>D.groups.find(g=>g.id==id),gmax=g=>g.subs.reduce((a,s)=>a+num(s.m),0);
