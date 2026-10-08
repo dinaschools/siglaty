@@ -50,7 +50,7 @@ td.ix i.np{position:absolute;right:1px;top:0;color:#c33;cursor:pointer;display:n
 @media print{
 @page{margin:0}
 html,body{background:#fff;padding:0}.bar,.imp,.np{display:none!important}
-.stage{padding:0 calc(var(--pm,5)*1mm);overflow:visible}.page{padding:0;box-shadow:none;zoom:var(--zl,1);width:var(--pwl,1123px)}@media print and (orientation:portrait){.page{zoom:var(--zp,1);width:var(--pwp,794px)}}.wr{display:table;width:100%}.wh{display:table-header-group}.wf{display:table-footer-group}.wb{display:table-row-group}.wh::before,.wf::before{content:"";display:block;height:calc(var(--pm,5)*1mm)}body.fit .page{break-inside:avoid}
+.stage{padding:calc(var(--pm,5)*1mm);overflow:visible}.page{padding:0;box-shadow:none;zoom:var(--zl,1);width:var(--pwl,1123px)}@media print and (orientation:portrait){.page{zoom:var(--zp,1);width:var(--pwp,794px)}}.wr,.wh,.wf,.wb{display:block}body.fit .page{break-inside:avoid}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 thead{display:table-header-group}tr{break-inside:avoid}
 .mc i{display:none}input.bad{background:none;color:inherit}}
@@ -107,7 +107,7 @@ const ps=D.st.map(s=>({n:s.n,p:pcOf(s)})).filter(x=>x.p!==''),el=document.getEle
 if(!ps.length){el.innerHTML='';return}
 const top=[...ps].sort((a,b)=>b.p-a.p).slice(0,3).map(x=>esc(x.n||'—')+' ('+x.p+'%)').join('، '),low=ps.filter(x=>x.p<D.pass);
 el.innerHTML=`<b>ملخص:</b> رُصدت درجات ${ps.length} من ${D.st.length} · المتوسط ${rd(ps.reduce((a,x)=>a+x.p,0)/ps.length)}% · الأوائل: ${top} · أقل من ${D.pass}٪ (${low.length}): ${low.slice(0,8).map(x=>esc(x.n||'—')).join('، ')||'لا أحد'}`}
-function render(){D.pct=false;D.pm??=5;$('#or').value=D.or||'';$('#ft').checked=!!D.fit;ap();if(!D.m2){D.m2=1;if(!D.meta.some(m=>m[0]=='الأسبوع'))D.meta.push(['الأسبوع',''],['من',''],['إلى',''])}if(!D.m1){D.m1=1;D.sig=D.sig.map(x=>x=='رئيس القسم'?'المدير الأكاديمي':x)}D.stats??=true;D.hl??=['المملكة العربية السعودية','وزارة التعليم','الإدارة العامة للتعليم بمحافظة جدة','مدارس دينا العالمية'];D.lb={...DL,...D.lb};D.gs??=[[90,'ممتاز'],[80,'جيد جداً'],[70,'جيد'],[60,'مقبول'],[0,'ضعيف']];D.pass??=50;D.mcols??=4;D.lg??={};
+function render(){D.pct=false;D.pm??=5;if(!D.m3){D.m3=1;D.or=D.or||'landscape'}$('#or').value=D.or||'';$('#ft').checked=!!D.fit;ap();if(!D.m2){D.m2=1;if(!D.meta.some(m=>m[0]=='الأسبوع'))D.meta.push(['الأسبوع',''],['من',''],['إلى',''])}if(!D.m1){D.m1=1;D.sig=D.sig.map(x=>x=='رئيس القسم'?'المدير الأكاديمي':x)}D.stats??=true;D.hl??=['المملكة العربية السعودية','وزارة التعليم','الإدارة العامة للتعليم بمحافظة جدة','مدارس دينا العالمية'];D.lb={...DL,...D.lb};D.gs??=[[90,'ممتاز'],[80,'جيد جداً'],[70,'جيد'],[60,'مقبول'],[0,'ضعيف']];D.pass??=50;D.mcols??=4;D.lg??={};
 $('#hl').innerHTML=D.hl.map((x,i)=>`<div><span contenteditable data-hl="${i}">${esc(x)}</span><a class="np" data-act="dh" data-i="${i}">×</a></div>`).join('')+'<a class="np" data-act="ah">＋ سطر</a>';
 for(const s of 'rl'){const im=$('.lw.'+(s=='r'?'ri':'le')+' img');if(!DEF[s])DEF[s]=im.src;const o=D.lg[s]||{};im.src=o.u||DEF[s];im.style.visibility=o.h?'hidden':'visible'}
 $('#meta').style.gridTemplateColumns=`repeat(${D.mcols},1fr)`;$('#sf').checked=D.stats;
@@ -203,7 +203,7 @@ const buf=await wb.xlsx.writeBuffer();
 dl('سجل-متابعة.xlsx',new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}))}
 function ap(){document.getElementById('pgs').textContent=D.or?`@page{size:A4 ${D.or};margin:0}`:''}
 function fw(){const r=document.documentElement.style;r.setProperty('--sw','1123px');r.setProperty('--sw',Math.max(1123,document.getElementById('tb').offsetWidth+36)+'px')}
-function prep(){document.body.classList.toggle('fit',!!D.fit);const pg=document.querySelector('.page'),sm=document.getElementById('sm'),mm=3.7795,m=D.pm??5,W=pg.offsetWidth,H=pg.offsetHeight-(sm?sm.offsetHeight:0),r=document.documentElement.style,f=(a,b)=>{const z=Math.min(a*mm/W,D.fit?b*mm/H:1,1)*.995;return[z,a*mm/z]};
+function prep(){document.body.classList.toggle('fit',!!D.fit);const pg=document.querySelector('.page'),sm=document.getElementById('sm'),mm=3.7795,m=D.pm??5,W=pg.offsetWidth,H=pg.offsetHeight-(sm?sm.offsetHeight:0),r=document.documentElement.style,f=(a,b)=>{const z=Math.min((a*mm-6)/W,D.fit?(b*mm-6)/H:1,1)*.99;return[z,(a*mm-6)/z]};
 let[zl,wl]=f(297-2*m,210-2*m),[zp,wp]=f(210-2*m,297-2*m);r.setProperty('--pm',m);r.setProperty('--zl',zl);r.setProperty('--pwl',wl+'px');r.setProperty('--zp',zp);r.setProperty('--pwp',wp+'px')}
 function toast(m){const e=document.getElementById('ts');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
 function doPrint(){try{prep();window.focus();window.print();if(window.top!==window.self)toast('إن لم تظهر نافذة الطباعة فاضغط Ctrl+P أو افتح السجل في صفحة مستقلة')}catch(e){toast('تعذرت الطباعة من هذا العرض؛ اضغط Ctrl+P')}}
